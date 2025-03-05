@@ -1,9 +1,11 @@
-#[wasm_bindgen::prelude::wasm_bindgen]
-pub fn hydrate() {
-    use app::*;
-    // initializes logging using the `log` crate
-    _ = console_log::init_with_level(log::Level::Debug);
-    console_error_panic_hook::set_once();
+use leptos::mount::mount_to_body;
+use leptos::*;
+use components::app::App;
 
-    leptos::mount::hydrate_body(App);
+mod components;
+mod models;
+mod services;
+
+fn main() {
+    mount_to_body(|| view! { <App /> })
 }

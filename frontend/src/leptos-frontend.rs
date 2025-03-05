@@ -1,5 +1,7 @@
 // main.rs
 use leptos::*;
+use leptos::prelude::*;
+
 use serde::{Deserialize, Serialize};
 use reqwest::Client;
 

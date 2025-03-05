@@ -1,13 +1,16 @@
 use leptos::*;
+use leptos::prelude::*;
 
 #[component]
-pub fn LoginScreen(on_login: Callback<String>) -> impl IntoView {
-    let username = create_rw_signal(String::new());
+pub fn LoginScreen(
+    #[prop(into)] on_login: Callback<String>,
+) -> impl IntoView {
+    let username = RwSignal::new(String::new());
     
     let handle_submit = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
         if !username.get().is_empty() {
-            on_login(username.get());
+            on_login.run(username.get());
         }
     };
     

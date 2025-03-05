@@ -1,12 +1,13 @@
-use leptos::*;
+// In your data_entry_screen.rs file
+use leptos::prelude::*;
 use crate::models::user_state::UserState;
 use super::dropdown_select::DropdownSelect;
 
 #[component]
 pub fn DataEntryScreen(
     state: RwSignal<UserState>,
-    on_toggle_recording: Callback<bool>,
-    on_update_field: Callback<(&'static str, String)>,
+    #[prop(into)] on_toggle_recording: Callback<bool>,
+    #[prop(into)] on_update_field: Callback<(&'static str, String)>,
 ) -> impl IntoView {
     // Category options (replace these with your actual categories)
     let category1_options = vec!["Option 1A", "Option 1B", "Option 1C"];
@@ -25,7 +26,7 @@ pub fn DataEntryScreen(
                     <textarea 
                         id="text-entry"
                         prop:value=move || state.get().text_entry
-                        on:input=move |ev| on_update_field("text_entry", event_target_value(&ev))
+                        on:input=move |ev| on_update_field.run(("text_entry", event_target_value(&ev)))
                     ></textarea>
                 </div>
                 
@@ -35,7 +36,7 @@ pub fn DataEntryScreen(
                         label="Category 1"
                         options=category1_options
                         value=move || state.get().category1
-                        on_change=move |v| on_update_field("category1", v)
+                        on_change=move |v| on_update_field.run(("category1", v))
                     />
                     
                     <DropdownSelect 
@@ -43,7 +44,7 @@ pub fn DataEntryScreen(
                         label="Category 2"
                         options=category2_options
                         value=move || state.get().category2
-                        on_change=move |v| on_update_field("category2", v)
+                        on_change=move |v| on_update_field.run(("category2", v))
                     />
                     
                     <DropdownSelect 
@@ -51,7 +52,7 @@ pub fn DataEntryScreen(
                         label="Category 3"
                         options=category3_options
                         value=move || state.get().category3
-                        on_change=move |v| on_update_field("category3", v)
+                        on_change=move |v| on_update_field.run(("category3", v))
                     />
                     
                     <DropdownSelect 
@@ -59,7 +60,7 @@ pub fn DataEntryScreen(
                         label="Category 4"
                         options=category4_options
                         value=move || state.get().category4
-                        on_change=move |v| on_update_field("category4", v)
+                        on_change=move |v| on_update_field.run(("category4", v))
                     />
                 </div>
                 
@@ -70,7 +71,7 @@ pub fn DataEntryScreen(
                             <button 
                                 class="start-button"
                                 class:active=is_recording
-                                on:click=move |_| on_toggle_recording(true)
+                                on:click=move |_| on_toggle_recording.run(true)
                                 disabled=is_recording
                             >
                                 "Start Recording"
@@ -78,7 +79,7 @@ pub fn DataEntryScreen(
                             <button
                                 class="stop-button"
                                 class:active=!is_recording
-                                on:click=move |_| on_toggle_recording(false)
+                                on:click=move |_| on_toggle_recording.run(false)
                                 disabled=!is_recording
                             >
                                 "Stop Recording"
