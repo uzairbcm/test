@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["app", "frontend", "server"]
+members = ["frontend", "backend"]
 
 # need to be applied only to wasm build
 [profile.release]
@@ -14,7 +14,7 @@ leptos_meta = { version = "0.7.3"}
 leptos_router = { version = "0.7.3", features = ["nightly"] }
 leptos_axum = { version = "0.7.3" }
 
-axum = "0.7"
+axum = "0.8.1"
 cfg-if = "1"
 console_error_panic_hook = "0.1.7"
 console_log = "1"
