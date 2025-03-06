@@ -7,7 +7,7 @@ pub fn DropdownSelect(
     label: &'static str,
     options: Vec<&'static str>,
     value: Memo<String>,
-    on_change: fn(String),
+    #[prop(into)] on_change: Callback<String>,
 ) -> impl IntoView {
     view! {
         <div class="dropdown-group">
@@ -15,7 +15,7 @@ pub fn DropdownSelect(
             <select
                 id={id}
                 prop:value=move || value.get()
-                on:change=move |ev| on_change(event_target_value(&ev))
+                on:change=move |ev| on_change.run(event_target_value(&ev))
             >
                 <option value="">"-- Select a " {label} " --"</option>
                 {options.iter().map(|option| {

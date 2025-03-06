@@ -105,7 +105,7 @@ pub async fn update_user_state(
                     &timestamp,
                 ]);
                 
-                if let Err(_) = record_result.and_then(|_| writer.flush()) {
+                if let Err(_) = record_result.and_then(|_| Ok(writer.flush())) {
                     return StatusCode::INTERNAL_SERVER_ERROR;
                 }
             }

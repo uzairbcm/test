@@ -5,14 +5,31 @@ use super::dropdown_select::DropdownSelect;
 #[component]
 pub fn DataEntryScreen(
     state: RwSignal<UserState>,
-    on_toggle_recording: Box<dyn Fn(bool)>,
-    on_update_field: Box<dyn Fn(&'static str, String)>,
+    on_toggle_recording: Callback<bool>,
+    on_update_field: Callback<(&'static str, String)>,
 ) -> impl IntoView {
     // Category options (replace these with your actual categories)
     let category1_options = vec!["Option 1A", "Option 1B", "Option 1C"];
     let category2_options = vec!["Option 2A", "Option 2B", "Option 2C"];
     let category3_options = vec!["Option 3A", "Option 3B", "Option 3C"];
     let category4_options = vec!["Option 4A", "Option 4B", "Option 4C"];
+    
+    // Create individual callbacks for each dropdown
+    let on_category1_change = Callback::new(move |v: String| {
+        on_update_field.run(("category1", v));
+    });
+    
+    let on_category2_change = Callback::new(move |v: String| {
+        on_update_field.run(("category2", v));
+    });
+    
+    let on_category3_change = Callback::new(move |v: String| {
+        on_update_field.run(("category3", v));
+    });
+    
+    let on_category4_change = Callback::new(move |v: String| {
+        on_update_field.run(("category4", v));
+    });
     
     view! {
         <div class="data-entry-container">
@@ -25,7 +42,7 @@ pub fn DataEntryScreen(
                     <textarea 
                         id="text-entry"
                         prop:value=move || state.get().text_entry
-                        on:input=move |ev| on_update_field("text_entry", event_target_value(&ev))
+                        on:input=move |ev| on_update_field.run(("text_entry", event_target_value(&ev)))
                     ></textarea>
                 </div>
                 
@@ -34,32 +51,32 @@ pub fn DataEntryScreen(
                         id="category1"
                         label="Category 1"
                         options=category1_options
-                        value=create_memo(move |_| state.get().category1.clone())
-                        on_change=move |v| (on_update_field)("category1", v)
+                        value=Memo::new(move |_| state.get().category1.clone())
+                        on_change=on_category1_change
                     />
                     
                     <DropdownSelect 
                         id="category2"
                         label="Category 2"
                         options=category2_options
-                        value=create_memo(move |_| state.get().category2.clone())
-                        on_change=move |v| on_update_field("category2", v)
+                        value=Memo::new(move |_| state.get().category2.clone())
+                        on_change=on_category2_change
                     />
                     
                     <DropdownSelect 
                         id="category3"
                         label="Category 3"
                         options=category3_options
-                        value=create_memo(move |_| state.get().category3.clone())
-                        on_change=on_update_field("category3", v)
+                        value=Memo::new(move |_| state.get().category3.clone())
+                        on_change=on_category3_change
                     />
                     
                     <DropdownSelect 
                         id="category4"
                         label="Category 4"
                         options=category4_options
-                        value=create_memo(move |_| state.get().category4.clone())
-                        on_change=on_update_field("category4", v).set()
+                        value=Memo::new(move |_| state.get().category4.clone())
+                        on_change=on_category4_change
                     />
                 </div>
                 
@@ -70,7 +87,7 @@ pub fn DataEntryScreen(
                             <button 
                                 class="start-button"
                                 class:active=is_recording
-                                on:click=move |_| on_toggle_recording(true)
+                                on:click=move |_| on_toggle_recording.run(true)
                                 disabled=is_recording
                             >
                                 "Start Recording"
@@ -78,7 +95,7 @@ pub fn DataEntryScreen(
                             <button
                                 class="stop-button"
                                 class:active=!is_recording
-                                on:click=move |_| on_toggle_recording(false)
+                                on:click=move |_| on_toggle_recording.run(false)
                                 disabled=!is_recording
                             >
                                 "Stop Recording"
@@ -90,21 +107,32 @@ pub fn DataEntryScreen(
             
             <div class="status-container">
                 <h3>"Recording Status"</h3>
-                {move || {
-                    let current = state.get();
-                    if let (Some(timestamp), Some(data)) = (current.last_saved.clone(), current.last_data.clone()) {
+                <Show
+                    when=move || {
+                        let current = state.get();
+                        current.last_saved.is_some() && current.last_data.is_some()
+                    }
+                    fallback=move || {
+                        view! {
+                            <p class="no-data">"No data saved yet"</p>
+                        }
+                    }
+                >
+                    {move || {
+                        let current = state.get();
+                        // We can safely unwrap here because the Show component only renders this
+                        // when both last_saved and last_data are Some
+                        let timestamp = current.last_saved.clone().unwrap();
+                        let data = current.last_data.clone().unwrap();
+                        
                         view! {
                             <div class="status-info">
                                 <p class="timestamp">"Last saved: " {timestamp}</p>
                                 <p class="data-summary">"Data: " {data}</p>
                             </div>
-                        }.into_view()
-                    } else {
-                        view! {
-                            <p class="no-data">"No data saved yet"</p>
-                        }.into_view()
-                    }
-                }}
+                        }
+                    }}
+                </Show>
             </div>
         </div>
     }
