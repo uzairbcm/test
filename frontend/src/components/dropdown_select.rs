@@ -6,16 +6,16 @@ pub fn DropdownSelect(
     id: &'static str,
     label: &'static str,
     options: Vec<&'static str>,
-    value: Signal<String>,
-    #[prop(into)] on_change: Callback<String>,
+    value: Memo<String>,
+    on_change: fn(String),
 ) -> impl IntoView {
     view! {
         <div class="dropdown-group">
             <label for={id}>{label}</label>
             <select
                 id={id}
-                prop:value={move || value.get()}
-                on:change=move |ev| on_change.run(event_target_value(&ev))
+                prop:value=move || value.get()
+                on:change=move |ev| on_change(event_target_value(&ev))
             >
                 <option value="">"-- Select a " {label} " --"</option>
                 {options.iter().map(|option| {
